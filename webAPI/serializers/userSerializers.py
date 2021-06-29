@@ -1,6 +1,8 @@
 from django.contrib.auth.models import User,Group
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 class GroupSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Group
@@ -25,3 +27,13 @@ class RegisterApiSerializer(serializers.ModelSerializer):
         # token = super().get_token(user)
         # token['name'] = user.name
         return user
+
+class TokenRefreshLifetimeSerializer(TokenRefreshSerializer):
+
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        refresh = RefreshToken(attrs['refresh'])
+        data['refresh']= str(refresh)
+        data['token_type']= str(refresh.token_type)
+        data['expires_in'] = int(refresh.access_token.lifetime.total_seconds())
+        return data

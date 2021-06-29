@@ -6,12 +6,12 @@ from rest_framework.urlpatterns import format_suffix_patterns
 from django.contrib import admin
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
-    TokenRefreshView,
+    # TokenRefreshView,
     TokenVerifyView,
 )
 
 #views
-from webAPI.views.User import api_root,UserViewSet,GroupViewSet,RegisterApi
+from webAPI.views.User import api_root,UserViewSet,GroupViewSet,RegisterApi,TokenRefreshView
 from webAPI.views.Cart import cart_list,cart_detail
 from webAPI.views.Category import category_list,category_detail
 from webAPI.views.Invoice import invoice_list,invoice_detail
@@ -49,13 +49,13 @@ urlpatterns = format_suffix_patterns([
     path('users/<int:pk>', user_detail, name='user-detail'),
         #product
     path('product/',product_list.as_view(),name='product-list'),
-    path('product/<int:pk>',product_detail.as_view(),name='product-detail'),
+    path('product/<int:pk>/',product_detail.as_view(),name='product-detail'),
          #product_image
     path('product_image/',product_Image_list.as_view(),name='product_image-list'),
-    path('product_image/<int:pk>',product_Image_detail.as_view(),name='product_image-detail'),
+    path('product_image/<int:pk>/',product_Image_detail.as_view(),name='product_image-detail'),
         #category
     path('category/', category_list.as_view(),name='category-list'),
-    path('category/<int:pk>',category_detail.as_view(),name='category-detail'),
+    path('category/<int:pk>/',category_detail.as_view(),name='category-detail'),
         #cart
     path('cart/', cart_list.as_view(),name='cart-list'),
     path('cart/<int:pk>',cart_detail.as_view(),name='cart-detail'),

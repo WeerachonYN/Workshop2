@@ -1,5 +1,6 @@
 
 from rest_framework.views import exception_handler
+from django.http import Http404
 def custom_exception_handler(exc, context):
 
     handlers = {
@@ -58,7 +59,8 @@ def _exception_ParseError(exc,context,response):
 
 def _exception_pageNotfound(exc,context,response):
     response.data = {
-        'error':'Not Found'
+        "code": "HTTP_404_NOT_FOUND",
+        'msg':'ไม่พบข้อมูล',
     }
     if response is not None:
         response.data['status_code'] = response.status_code  
@@ -91,7 +93,8 @@ def _exception_throttled(exc,context,response):
 
 def _exception_validatError(exc,context,response):
     response.data = {
-        'error':'Validation Error'
+        "msg" : "ลงทะเบียนไม่สำเร็จ",
+        "code": "REGISTER_FAIL",
     }
     if response is not None:
         response.data['status_code'] = response.status_code  
@@ -99,5 +102,9 @@ def _exception_validatError(exc,context,response):
 def _exception_AuthenticationFailed(exc,context,response):
 
     response.data = {
-        'error':'Unauthenticated'
+        'msg':'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง',
+        "code": "LOGIN_FAIL"
     }
+    if response is not None:
+        response.data['status_code'] = response.status_code  
+    return response   
