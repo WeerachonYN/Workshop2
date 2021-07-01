@@ -8,12 +8,14 @@ def custom_exception_handler(exc, context):
         'NotAuthenticated':_exception_notAuthenticated,
         'PermissionDenied':_exception_permissionDenied,
         'ParseError':_exception_ParseError,
-        'NotFound':_exception_pageNotfound,
+        'NotFound':_exception_NotFound,
         'NotAcceptable':_exception_notAccept,
         'UnsupportedMediaType':_exception_unsupportMD_type,
         'Throttled':_exception_throttled,
         'ValidationError':_exception_validatError,
-        'AuthenticationFailed':_exception_AuthenticationFailed
+
+        # 'AuthenticationFailed':_exception_AuthenticationFailed,
+        # 'InvalidToken':_exception_TokenError
     }
 
     response =  exception_handler(exc, context)
@@ -23,10 +25,21 @@ def custom_exception_handler(exc, context):
         return handlers[exception_class](exc,context,response)
     return response
 
+def _exception_TokenError(exc,context,response):
+    response.data = {
+  "msg" : "Refetch Token ไม่ถูกต้อง",
+  "code": "REFETCH_TOKEN_FAIL"
+}
+    if response is not None:
+        response.data['status_code'] = response.status_code
+  
+    return response
+
 def _exception_notAuthenticated(exc,context,response):
 
     response.data = {
-        'error':'Unauthenticated'
+         "code": "ADD_TO_CART_FAIL",
+         "msg": "บันทึกไม่สำเร็จ",
     }
     if response is not None:
         response.data['status_code'] = response.status_code
@@ -57,12 +70,14 @@ def _exception_ParseError(exc,context,response):
         response.data['status_code'] = response.status_code  
     return response
 
-def _exception_pageNotfound(exc,context,response):
-    response.data = {
+def _exception_NotFound(exc,context,response):
+    
+    if response is not None:
+        if response.status_code == 404:
+            response.data = {
         "code": "HTTP_404_NOT_FOUND",
         'msg':'ไม่พบข้อมูล',
     }
-    if response is not None:
         response.data['status_code'] = response.status_code  
     return response
 
@@ -91,20 +106,27 @@ def _exception_throttled(exc,context,response):
         response.data['status_code'] = response.status_code  
     return response   
 
-def _exception_validatError(exc,context,response):
-    response.data = {
-        "msg" : "ลงทะเบียนไม่สำเร็จ",
-        "code": "REGISTER_FAIL",
-    }
-    if response is not None:
-        response.data['status_code'] = response.status_code  
-    return response   
-def _exception_AuthenticationFailed(exc,context,response):
 
-    response.data = {
-        'msg':'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง',
-        "code": "LOGIN_FAIL"
-    }
+
+
+    
+def _exception_validatError(exc,context,response):
+    
     if response is not None:
+        if response.status_code == 400:
+            response.data = {
+                    "msg" : "กรุณากรอกข้อมูลให้ครบถ้วน",
+                    "code": "This field may not be blank"
+                    }
         response.data['status_code'] = response.status_code  
-    return response   
+    return response  
+
+# def _exception_AuthenticationFailed(exc,context,response):
+
+#     response.data = {
+#         'msg':'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง',
+#         "code": "LOGIN_FAIL"
+#     }
+#     if response is not None:
+#         response.data['status_code'] = response.status_code  
+#     return response   

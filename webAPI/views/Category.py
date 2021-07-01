@@ -12,11 +12,12 @@ from webAPI.models.category import Category
 #permission & Authenticated
 from rest_framework import permissions
 from webAPI.permissions import IsOwnerOrReadOnly
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+# from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import IsAuthenticated
 from webAPI.paginations import CustomPagination
 from webAPI.ordering import MyCustomOrdering
-
+from webAPI.exception import custom_exception_handler
+from rest_framework.exceptions import NotFound
 class category_list(generics.ListCreateAPIView):
     queryset = Category.objects.all()
     serializer_class = categorySerializers
@@ -43,6 +44,9 @@ class category_list(generics.ListCreateAPIView):
 class category_detail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Category.objects.all()
     serializer_class = categorySerializers
-   
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-                
+  
+           
+             
+        
+    

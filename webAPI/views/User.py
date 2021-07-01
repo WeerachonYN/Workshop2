@@ -14,7 +14,7 @@ from rest_framework import filters
 #permission & Authenticated
 from rest_framework import permissions
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated,AllowAny
 #api_root
 from rest_framework.decorators import api_view
 from rest_framework.reverse import reverse
@@ -30,11 +30,13 @@ import datetime,jwt
 from webAPI.exception import custom_exception_handler
 #jwt
 from rest_framework_simplejwt.views import TokenViewBase
-from webAPI.serializers.userSerializers import TokenRefreshLifetimeSerializer
+from webAPI.serializers.userSerializers import TokenRefreshLifetimeSerializer,TokenObtainLifetimeSerializer
+from rest_framework import status
 
 @api_view(['GET'])
 def api_root(request, format=None):
     return Response({
+        'register':reverse('register', request=request, format=format),
         'users': reverse('user-list', request=request, format=format),
         'group':reverse('group',request=request, format=format),
         'product': reverse('product-list', request=request, format=format),
@@ -73,8 +75,10 @@ class GroupViewSet(viewsets.ModelViewSet):
 #Register
 class RegisterApi(generics.GenericAPIView):
     serializer_class = RegisterApiSerializer
+    permission_classes = (AllowAny, )
     
     def post(self, request, *args,  **kwargs):
+        
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -84,23 +88,27 @@ class RegisterApi(generics.GenericAPIView):
             refresh = RefreshToken.for_user(user)
             return Response({
                 # "user": UserSerializer(user,    context=self.get_serializer_context()).data,
-                # "message": "User Created Successfully.  Now perform Login to get your token",
-                # 'id':self.user.id,
-                # 'user':str(self.user),
                 'refresh': str(refresh),
                 'access': str(refresh.access_token),
                 'token_type':str(refresh.token_type),
                 'expires_in':int(refresh.access_token.lifetime.total_seconds()),
 
-                })
+                },status = status.HTTP_201_CREATED)
         else:
             # error_list = [serializer.errors[error][0] for error in serializer.errors]
             return Response({
                  "msg" : "ลงทะเบียนไม่สำเร็จ",
                  "code": "REGISTER_FAIL",
                  "errors":serializer.errors,
-            })
-
+               
+            },status = status.HTTP_400_BAD_REQUEST)
+#LOGIN
+class TokenObtainPairView(TokenViewBase):
+    """
+        Return JWT tokens (access and refresh) for specific user based on username and password.
+    """
+    serializer_class = TokenObtainLifetimeSerializer
+#REFESH
 class TokenRefreshView(TokenViewBase):
     """
         Renew tokens (access and refresh) with new expire time based on specific user's access token.

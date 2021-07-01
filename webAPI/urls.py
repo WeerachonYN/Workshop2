@@ -11,7 +11,7 @@ from rest_framework_simplejwt.views import (
 )
 
 #views
-from webAPI.views.User import api_root,UserViewSet,GroupViewSet,RegisterApi,TokenRefreshView
+from webAPI.views.User import api_root,UserViewSet,GroupViewSet,RegisterApi,TokenRefreshView,TokenObtainPairView
 from webAPI.views.Cart import cart_list,cart_detail
 from webAPI.views.Category import category_list,category_detail
 from webAPI.views.Invoice import invoice_list,invoice_detail
@@ -58,7 +58,7 @@ urlpatterns = format_suffix_patterns([
     path('category/<int:pk>/',category_detail.as_view(),name='category-detail'),
         #cart
     path('cart/', cart_list.as_view(),name='cart-list'),
-    path('cart/<int:pk>',cart_detail.as_view(),name='cart-detail'),
+    path('cart/<int:pk>/',cart_detail.as_view(),name='cart-detail'),
          #invoice
     path('invoice/', invoice_list.as_view(),name='invoice-list'),
     path('invoice/<int:pk>',invoice_detail.as_view(),name='invoice-detail'),

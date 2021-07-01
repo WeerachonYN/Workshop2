@@ -16,13 +16,14 @@ class ProductAdmin(admin.ModelAdmin):
         model = Product
     inlines = [ ImageProductAdmins]
     list_display = (
- 
+        'id',
         'category',
         'name',
         'price',
          'detail',
          'image',
         'is_enabled',
+        'created_datetime'
     )
     list_editable = (
         'is_enabled',
@@ -42,7 +43,7 @@ admin.site.register(Product,ProductAdmin)
 
 class CartAdmin(admin.ModelAdmin):
     list_display = (
-    
+        'id',
         'product',
         'user',
         'quantity',

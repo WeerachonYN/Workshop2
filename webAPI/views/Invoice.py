@@ -10,7 +10,7 @@ from webAPI.models.Invoice import invoice
 #permission & Authenticated
 from rest_framework import permissions
 from webAPI.permissions import IsOwnerOrReadOnly
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+# from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import IsAuthenticated
 
 class invoice_list(generics.ListCreateAPIView):

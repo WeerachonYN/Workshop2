@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'rest_framework.authtoken',
     'django_filters',
+    'versatileimagefield',
     'webAPI.apps.WebapiConfig',
  
 ]
@@ -110,7 +111,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'th'
 
 TIME_ZONE = 'UTC'
 
@@ -135,13 +136,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 REST_FRAMEWORK = {
     #auth
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        # 'rest_framework.authentication.BasicAuthentication',
-        # 'rest_framework.authentication.SessionAuthentication',
-        # 'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
         #permissions
-    'DEFAULT_PERMISSION_CLASSES': [
+    'DEFAULT_PERMISSION_CLASSES': (
+
         # 'rest_framework.permissions.IsAuthenticated',
         #  'rest_framework.permissions.IsAd/minUser',
         #AllowAny
@@ -149,7 +151,7 @@ REST_FRAMEWORK = {
         #IsAdminUser
         #IsAuthenticatedOrReadOnly
         
-    ],
+    ),
     #exception
     'EXCEPTION_HANDLER': 'webAPI.exception.custom_exception_handler',
      #pagination
