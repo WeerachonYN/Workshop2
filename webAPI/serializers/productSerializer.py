@@ -11,14 +11,9 @@ class Product_ListSerializers(serializers.ModelSerializer):
 
 class Product_DetailSerializers(serializers.ModelSerializer):
     product_image = ProductImageSerializers(many=True,  read_only=True)
-    # product_image = VersatileImageFieldSerializer(
-    #     sizes=[
-    #         # ('full_size', 'url'),
-    #         # ('thumbnail', 'thumbnail__100x100'),
-    #         # ('medium_square_crop', 'crop__400x400'),
-    #         # ('small_square_crop', 'crop__50x50')
-    #     ]
-    # )
+    image = VersatileImageFieldSerializer(
+        sizes='headshot'
+    )
     # category = Product.objects.filter(category__in=(1,2))
     class Meta:
         model = Product

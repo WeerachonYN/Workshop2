@@ -85,7 +85,7 @@ admin.site.register(Category,CategoryAdmin)
 
 class InvoiceAdmin(admin.ModelAdmin):
     list_display = (
-  
+        'id',
         'user',
         'created_datetime',
         'updated_datetime',
@@ -106,7 +106,14 @@ class InvoiceAdmin(admin.ModelAdmin):
 admin.site.register(invoice,InvoiceAdmin)
 
 class InvoiceITEMAdmin(admin.ModelAdmin):
-    pass
+      list_display = (
+        'id',
+        'product',
+        'invoice',
+        'created_datetime',
+        'quantity',
+        'total'
+    )
 admin.site.register(invoice_item,InvoiceITEMAdmin)
 
 

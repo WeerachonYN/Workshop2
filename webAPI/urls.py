@@ -14,7 +14,7 @@ from rest_framework_simplejwt.views import (
 from webAPI.views.User import api_root,UserViewSet,GroupViewSet,RegisterApi,TokenRefreshView,TokenObtainPairView
 from webAPI.views.Cart import cart_list,cart_detail
 from webAPI.views.Category import category_list,category_detail
-from webAPI.views.Invoice import invoice_list,invoice_detail
+from webAPI.views.Invoice import invoice_list,invoice_detail,checkouts,void_status
 from webAPI.views.Invoice_Item import invoice_item_list,invoice_item_detail
 from webAPI.views.Product import product_list,product_detail
 from webAPI.views.Product_Image import product_Image_list,product_Image_detail
@@ -59,12 +59,17 @@ urlpatterns = format_suffix_patterns([
         #cart
     path('cart/', cart_list.as_view(),name='cart-list'),
     path('cart/<int:pk>/',cart_detail.as_view(),name='cart-detail'),
+    # path('cart/<int:cart_id>/',cart_Delete.as_view(),name='cart-delete'),
+
          #invoice
+    path('checkout/', checkouts.as_view(),name='checkout'),    
     path('invoice/', invoice_list.as_view(),name='invoice-list'),
-    path('invoice/<int:pk>',invoice_detail.as_view(),name='invoice-detail'),
+    path('invoice/<int:pk>/',invoice_detail.as_view(),name='invoice-detail'),
+    #void
+    path('invoice/<int:pk>/void/',void_status.as_view(),name='invoice-detail'),
         #invoice_item
     path('invoice_item/', invoice_item_list.as_view(),name='invoice_item-list'),
-    path('invoice_item/<int:pk>',invoice_item_detail.as_view(),name='invoice_item-detail'),
-
+    path('invoice_item/<int:pk>/',invoice_item_detail.as_view(),name='invoice_item-detail'),
+   
 ])
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

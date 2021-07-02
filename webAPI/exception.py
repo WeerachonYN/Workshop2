@@ -38,8 +38,8 @@ def _exception_TokenError(exc,context,response):
 def _exception_notAuthenticated(exc,context,response):
 
     response.data = {
-         "code": "ADD_TO_CART_FAIL",
-         "msg": "บันทึกไม่สำเร็จ",
+         "code": "HTTP_401_UNAUTHORIZED",
+         "msg": "Authentication credentials were not provided.",
     }
     if response is not None:
         response.data['status_code'] = response.status_code

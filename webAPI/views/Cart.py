@@ -5,7 +5,7 @@ from rest_framework import generics
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
 #serializer & Models
-from webAPI.serializers.cartSerializers import cartSerializers
+from webAPI.serializers.cartSerializers import cartSerializers,cartEditSerializers
 from webAPI.models.cart import Cart
 from webAPI.models.product import Product
 #permission & Authenticated
@@ -13,7 +13,7 @@ from rest_framework import permissions
 from webAPI.permissions import IsOwnerOrReadOnly
 # from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.exceptions import NotFound ,NotAuthenticated
+from rest_framework.exceptions import NotFound ,ParseError,NotAuthenticated
 from webAPI.custom_Response import ResponseInfo
 from rest_framework import status
 from django.contrib.auth.admin import User
@@ -28,49 +28,65 @@ class cart_list(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     # def perform_create(self, serializer):
     #     serializer.save(user=self.request.user)  
-   
+    
     def post(self, request, *args,  **kwargs):
         serializer = self.get_serializer(data=request.data)
-        print('req_data=',request.data)
+        data ={}
         if serializer.is_valid():
+            try:
+                product_id = serializer.data['product']
+                products =Product.objects.get(pk=int(product_id))
+            except:
+               
+                return Response({  
+                    "code": "ADD_TO_CART_FAIL",
+                    'msg': "สินค้าไม่มีตามที่ระบุ",
+                },status = status.HTTP_400_BAD_REQUEST)
+             
             user_id=self.request.user
             user = User.objects.get(username=user_id)
-            print(user)
-            product_id = serializer.data['product']
-            products =Product.objects.get(pk=int(product_id))
-            quantitys = serializer.data['quantity']
+            quantitys = int(serializer.data['quantity'])
+
             items = Cart.objects.filter(user=user,product=int(product_id)).first()
-            
             if items:
-                    #เพิ่ม 
                 items.quantity += quantitys
-                    
                 multiply=quantitys*products.price
                 print('multiply:',multiply,'=',items.quantity,'*',products.price)
                 items.total += multiply
                 print('sum:',items.total,'=',items.total,'+',multiply)
                 # print(items.user)
                 items.save()   
-            else:
-                    
-                new_item = Cart.objects.create(product=products,user=user,quantity=quantitys,total=quantitys*products.price)
-                new_item.save()
-                # serializer = CartSerializer(self.get_object())
-            return Response({  
-                "data": serializer.data,
+            else:  
+                items = Cart.objects.create(product=products,user=user,quantity=quantitys,total=quantitys*products.price)
+                items.save()
 
-                'msg': "บันทึกสำเร็จ"
+            data['id'] = items.id
+            data['product'] = items.product.name
+            data['quantity'] = items.quantity
+            data['total'] = items.total
+            return Response({ 
+                'msg': "บันทึกสำเร็จ", 
+                "data": data,
                 
                 },status = status.HTTP_201_CREATED)
         else:
-            raise NotAuthenticated("บันทึกไม่สำเร็จ")
-        
+            return Response({  
+               
+                "code": "ADD_TO_CART_FAIL",
+                'msg': "บันทึกไม่สำเร็จ",
+                 "error": serializer.errors
+                },status = status.HTTP_401_UNAUTHORIZED)
+   
+
+    
+            
     def __init__(self, **kwargs):
         self.response_format = ResponseInfo().response
         super(cart_list, self).__init__(**kwargs)
 
     def get(self, request, *args, **kwargs):
         response_data = super(cart_list, self).list(request, *args, **kwargs)
+        # response_data = user.username
         self.response_format["data"] = response_data.data
         self.response_format["status"] = True
         if not response_data.data:
@@ -88,37 +104,42 @@ class cart_detail(generics.RetrieveUpdateDestroyAPIView):
     ordering_fields = ['id','quantity', 'total']
     permission_classes = [permissions.IsAuthenticated]
 
-    def delete(self, request, *args,  **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            user=self.request.user
-            product_id = serializer.data['product']
-            products =Product.objects.get(pk=int(product_id))
-            quantitys = serializer.data['quantity']
-            items = Cart.objects.filter(user=user,product=int(product_id)).first()
-            
-            if items.quantity ==1:
-                items.delete()
-            else:
-                    #เพิ่ม
-                items.quantity -= quantitys
-                    
-                multiply=quantitys*products.price
-                print('multiply:',multiply,'=',items.quantity,'*',products.price)
-                items.total -= multiply
-                print('sum:',items.total,'=',items.total,'+',multiply)
-                    # print(items.quantity)
-                items.save()   
-                # serializer = CartSerializer(self.get_object())
-            return Response({  
-                "data": serializer.data,
+    def destroy(self, request, *args, **kwargs):
+        # print(kwargs)
+        current_user = self.request.user 
+        try:
+            instance = self.get_object()
+            cart_user = Cart.objects.get(pk=kwargs['pk']).user
+        except:
+            #not found
+            raise NotFound()
+        #User Forbidden
+        if  cart_user != current_user:
+            return Response({"code": "HTTP_403_FORBIDDEN",'msg':'ไม่มีสิทธ์เข้าใช้งาน'},status=status.HTTP_403_FORBIDDEN)
+       #Delete
+        self.perform_destroy(instance)
+        return Response({'msg':'ลบข้อมูลสำเร็จ'},status=status.HTTP_200_OK)
 
-                'msg': "ลบสำเร็จ"
-                
-                },status = status.HTTP_201_CREATED)
-        else:
-            raise NotAuthenticated("ลบไม่สำเร็จ",e)
-
+    def patch(self, request, pk):
+        try:
+            cartlist = Cart.objects.get(id=pk)
+        except:
+            raise NotFound()
+        data = request.data
+        cartlist.total = int(data['quantity'])*(cartlist.product.price)
+        cartlist.quantity = data['quantity']
+        if cartlist == 0:
+            cartlist.delete()
+            return Response({
+                "msg":"ลบข้อมูลสำเร็จ",
+            },200)
+        cartlist.save()
+        response = cartSerializers(cartlist).data
+        return Response({
+            "msg" : "บันทึกสำเร็จ",
+            "data":[response]
+        })
+  
     def retrieve(self, request, *args, **kwargs):
             instance = self.get_object()
             serializer = self.get_serializer(instance)
@@ -128,21 +149,12 @@ class cart_detail(generics.RetrieveUpdateDestroyAPIView):
                         "data": serializer.data
                 }
                 return Response(custom_data)
-    def perform_update(self, serializer):
-        instance = serializer.save()
-        send_email_confirmation(user=self.request.user, modified=instance)
-    # def partial_update(self, request,**kwargs):
-        
-    #     try:
-    #         queryset = Cart.objects.get(pk=kwargs)
-    #     except queryset.DoesNotExist:
-    #         return Response(status=status.HTTP_404_NOT_FOUND)
-    #     serializer = cartSerializers(queryset,data=request.data)
-    #     data= {}
-    #     if serializer.is_valid():
-    #         serializer.save()
-    #         data['success'] = "update successful"
-    #         return Response(data=data)
-    #     return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
-        
-  
+
+    def get_object(self):
+        queryset = self.get_queryset()
+        try:
+            obj =  queryset.get(pk=self.kwargs['pk'])
+            
+        except:
+            raise NotFound()
+        return obj

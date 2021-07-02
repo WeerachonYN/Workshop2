@@ -97,8 +97,4 @@ class product_detail(generics.RetrieveUpdateDestroyAPIView):
             
         except:
             raise NotFound()
-        # obj = get_object_or_404(queryset, **filter)
-        # self.check_object_permissions(self.request, obj)
-        # obj['msg']= 'okok'
-        
         return obj

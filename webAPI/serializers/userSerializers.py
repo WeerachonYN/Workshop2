@@ -56,16 +56,15 @@ class RegisterApiSerializer(serializers.ModelSerializer):
             raise ValidationError('รหัสผ่านต้องมากกว่า 8 ตัวอักษร')
         return password
 
-    # def validate_username(self, username):
-    #     queryset = User.objects.get(username=username)
-    #     if queryset.exists():
-    #         raise ValidationError('มีผู้ใช้งาน username นี้แล้ว')
-    #     return username
-        # return username
     def create(self, validated_data):
-        user = User.objects.create_user(validated_data['username'],     password = validated_data['password']  ,first_name=validated_data['first_name'],  last_name=validated_data['last_name'])
+        user = User.objects.create_user(
+           username= validated_data['username'],     
+            password = validated_data['password']  ,
+            first_name=validated_data['first_name'],  
+            last_name=validated_data['last_name'])
         # token = super().get_token(user)
         # token['name'] = user.name
+        user.save()
         return user
 
 #refreshTOKEN

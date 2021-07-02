@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 import datetime
 
+
 STATUS_CHOICE = (
     ('Wait', 'รอส่ง'),
     ('Success', 'ส่งแล้ว'),

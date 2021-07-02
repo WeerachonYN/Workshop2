@@ -79,27 +79,27 @@ class RegisterApi(generics.GenericAPIView):
     
     def post(self, request, *args,  **kwargs):
         
-        serializer = self.get_serializer(data=request.data)
+        serializer = RegisterApiSerializer(data=request.data)
+        data ={}
         if serializer.is_valid():
-            serializer.save()
             user = serializer.save()
+            refresh = RefreshToken.for_user(user)
+            data['refresh'] = str(refresh)
+            data['access']=str(refresh.access_token)
+            data['token_type']=str(refresh.token_type)
+            data['expires_in']=int(refresh.access_token.lifetime.total_seconds())
+        
+
             #auto token
             # token, created = Token.objects.get_or_create(user=serializer.instance)
-            refresh = RefreshToken.for_user(user)
-            return Response({
-                # "user": UserSerializer(user,    context=self.get_serializer_context()).data,
-                'refresh': str(refresh),
-                'access': str(refresh.access_token),
-                'token_type':str(refresh.token_type),
-                'expires_in':int(refresh.access_token.lifetime.total_seconds()),
-
-                },status = status.HTTP_201_CREATED)
+            return Response(data,status = status.HTTP_201_CREATED)
         else:
             # error_list = [serializer.errors[error][0] for error in serializer.errors]
+            data = serializer.errors
             return Response({
                  "msg" : "ลงทะเบียนไม่สำเร็จ",
                  "code": "REGISTER_FAIL",
-                 "errors":serializer.errors,
+                 "errors":data,
                
             },status = status.HTTP_400_BAD_REQUEST)
 #LOGIN

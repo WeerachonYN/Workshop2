@@ -45,7 +45,25 @@ class category_detail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Category.objects.all()
     serializer_class = categorySerializers
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-  
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        if serializer.data:
+            custom_data = {
+                    "status": "ดึงข้อมูลสำเร็จ",
+                    "data": serializer.data
+            }
+            return Response(custom_data)
+            
+    def get_object(self):
+        queryset = self.get_queryset()
+        try:
+            obj =  queryset.get(pk=self.kwargs['pk'])
+            
+        except:
+            raise NotFound()
+        return obj
            
              
         
