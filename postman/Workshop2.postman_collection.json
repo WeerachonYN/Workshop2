@@ -173,11 +173,6 @@
 									"value": "10"
 								},
 								{
-									"key": "sort",
-									"value": "asc",
-									"disabled": true
-								},
-								{
 									"key": "is_enabled ",
 									"value": "true"
 								}
@@ -229,7 +224,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{api_URL}}/product/?page=1&page_size=8&is_enabled=true&search=&sort=desc",
+							"raw": "{{api_URL}}/product/?page={{int}}&page_size=10&is_enabled=true&search={{product_name}}&category_not_in={{int}},{{int}}&sort=[{{desc}},{{asc}}]&category__in={{int}},{{int}}",
 							"host": [
 								"{{api_URL}}"
 							],
@@ -240,11 +235,11 @@
 							"query": [
 								{
 									"key": "page",
-									"value": "1"
+									"value": "{{int}}"
 								},
 								{
 									"key": "page_size",
-									"value": "8"
+									"value": "10"
 								},
 								{
 									"key": "is_enabled",
@@ -252,21 +247,19 @@
 								},
 								{
 									"key": "search",
-									"value": ""
+									"value": "{{product_name}}"
 								},
 								{
 									"key": "category_not_in",
-									"value": "",
-									"disabled": true
+									"value": "{{int}},{{int}}"
 								},
 								{
 									"key": "sort",
-									"value": "desc"
+									"value": "[{{desc}},{{asc}}]"
 								},
 								{
 									"key": "category__in",
-									"value": "1,2,3,4,5,6",
-									"disabled": true
+									"value": "{{int}},{{int}}"
 								}
 							]
 						}
@@ -285,51 +278,14 @@
 							}
 						],
 						"url": {
-							"raw": "{{api_URL}}/product/1/",
+							"raw": "{{api_URL}}/product/{{product_id}}/",
 							"host": [
 								"{{api_URL}}"
 							],
 							"path": [
 								"product",
-								"1",
+								"{{product_id}}",
 								""
-							],
-							"query": [
-								{
-									"key": "page",
-									"value": "1",
-									"disabled": true
-								},
-								{
-									"key": "page_size",
-									"value": "2",
-									"disabled": true
-								},
-								{
-									"key": "is_enabled",
-									"value": "true",
-									"disabled": true
-								},
-								{
-									"key": "search",
-									"value": "",
-									"disabled": true
-								},
-								{
-									"key": "category_in",
-									"value": "[3]",
-									"disabled": true
-								},
-								{
-									"key": "sort",
-									"value": "desc",
-									"disabled": true
-								},
-								{
-									"key": "category_not_in",
-									"value": null,
-									"disabled": true
-								}
 							]
 						}
 					},
@@ -361,20 +317,15 @@
 							"formdata": [
 								{
 									"key": "product",
-									"value": "1",
+									"value": "{{int}}",
 									"type": "text"
 								},
 								{
 									"key": "quantity",
-									"value": "1",
+									"value": "{{int}}",
 									"type": "text"
 								}
-							],
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
+							]
 						},
 						"url": {
 							"raw": "{{api_URL}}/cart/",
@@ -448,38 +399,20 @@
 							"mode": "formdata",
 							"formdata": [
 								{
-									"key": "product",
-									"value": "{{product}}",
-									"type": "text",
-									"disabled": true
-								},
-								{
 									"key": "quantity",
-									"value": "10",
+									"value": "{{int}}",
 									"type": "text"
-								},
-								{
-									"key": "user",
-									"value": "1",
-									"type": "text",
-									"disabled": true
-								},
-								{
-									"key": "product",
-									"value": "14",
-									"type": "text",
-									"disabled": true
 								}
 							]
 						},
 						"url": {
-							"raw": "{{api_URL}}/cart/1/",
+							"raw": "{{api_URL}}/cart/{{cart_id}}/",
 							"host": [
 								"{{api_URL}}"
 							],
 							"path": [
 								"cart",
-								"1",
+								"{{cart_id}}",
 								""
 							]
 						}
@@ -508,13 +441,13 @@
 							}
 						],
 						"url": {
-							"raw": "{{api_URL}}/cart/3/",
+							"raw": "{{api_URL}}/cart/{{cart_id}}/",
 							"host": [
 								"{{api_URL}}"
 							],
 							"path": [
 								"cart",
-								"3",
+								"{{cart_id}}",
 								""
 							]
 						}
@@ -616,13 +549,13 @@
 							}
 						],
 						"url": {
-							"raw": "{{api_URL}}/invoice/25/",
+							"raw": "{{api_URL}}/invoice/{{invoice_id}}/",
 							"host": [
 								"{{api_URL}}"
 							],
 							"path": [
 								"invoice",
-								"25",
+								"{{invoice_id}}",
 								""
 							]
 						}
@@ -642,7 +575,7 @@
 								}
 							]
 						},
-						"method": "GET",
+						"method": "POST",
 						"header": [
 							{
 								"key": "{{Content}}",
@@ -651,12 +584,14 @@
 							}
 						],
 						"url": {
-							"raw": "{{api_URL}}/invoice/",
+							"raw": "{{api_URL}}/invoice/{{invoice_id}}/void/",
 							"host": [
 								"{{api_URL}}"
 							],
 							"path": [
 								"invoice",
+								"{{invoice_id}}",
+								"void",
 								""
 							]
 						}
@@ -754,6 +689,26 @@
 		{
 			"key": "SuperPassword",
 			"value": "chon142323"
+		},
+		{
+			"key": "invoice_id",
+			"value": "1"
+		},
+		{
+			"key": "product_name",
+			"value": "name"
+		},
+		{
+			"key": "int",
+			"value": "1"
+		},
+		{
+			"key": "desc",
+			"value": "desc"
+		},
+		{
+			"key": "asc",
+			"value": "asc"
 		}
 	]
 }
