@@ -20,4 +20,4 @@ class InvoiceDetailSerializers(serializers.ModelSerializer):
 class checkoutSerializers(serializers.ModelSerializer):
     class Meta:
         model = invoice
-        fields = ['user']
+        fields = ['id']

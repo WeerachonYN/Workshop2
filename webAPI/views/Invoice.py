@@ -79,7 +79,6 @@ class checkouts(generics.CreateAPIView):
         data ={}
         carts = Cart.objects.filter(user=self.request.user) 
         sum_total=0
-        print(len(carts))
         if len(carts)!=0:
             for i in carts:
             
@@ -92,7 +91,6 @@ class checkouts(generics.CreateAPIView):
                     sum_total += i.total
             
             invoices = invoice.objects.create(user=self.request.user,total=sum_total)
-            print(invoices)
             if invoices:
                 invoices.save()
                 for item in carts:

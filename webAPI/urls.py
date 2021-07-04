@@ -58,7 +58,7 @@ urlpatterns = format_suffix_patterns([
     # path('cart')
     path('cart/<int:pk>/',cart_edit_delete.as_view(),name='cart-detail'),
     # path('cart/<int:cart_id>/',cart_Delete.as_view(),name='cart-delete'),
-         #invoice
+    #invoice
     path('checkout/', checkouts.as_view(),name='checkout'),    
     path('invoice/', invoice_list.as_view(),name='invoice-list'),
     path('invoice/<int:pk>/',invoice_detail.as_view(),name='invoice-detail'),

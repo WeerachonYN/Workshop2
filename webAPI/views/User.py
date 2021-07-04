@@ -77,7 +77,6 @@ class RegisterApi(generics.GenericAPIView):
     permission_classes = (AllowAny, )
     
     def post(self, request, *args,  **kwargs):
-        
         serializer = RegisterApiSerializer(data=request.data)
         data ={}
         if serializer.is_valid():
@@ -87,10 +86,6 @@ class RegisterApi(generics.GenericAPIView):
             data['access']=str(refresh.access_token)
             data['token_type']=str(refresh.token_type)
             data['expires_in']=int(refresh.access_token.lifetime.total_seconds())
-        
-
-            #auto token
-            # token, created = Token.objects.get_or_create(user=serializer.instance)
             return Response(data,status = status.HTTP_201_CREATED)
         else:
             # error_list = [serializer.errors[error][0] for error in serializer.errors]

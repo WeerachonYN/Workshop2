@@ -62,8 +62,7 @@ class RegisterApiSerializer(serializers.ModelSerializer):
             password = validated_data['password']  ,
             first_name=validated_data['first_name'],  
             last_name=validated_data['last_name'])
-        # token = super().get_token(user)
-        # token['name'] = user.name
+        
         user.save()
         return user
 
