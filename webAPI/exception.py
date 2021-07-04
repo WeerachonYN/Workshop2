@@ -15,7 +15,7 @@ def custom_exception_handler(exc, context):
         'ValidationError':_exception_validatError,
 
         # 'AuthenticationFailed':_exception_AuthenticationFailed,
-        # 'InvalidToken':_exception_TokenError
+        'InvalidToken':_exception_TokenError
     }
 
     response =  exception_handler(exc, context)
@@ -27,8 +27,8 @@ def custom_exception_handler(exc, context):
 
 def _exception_TokenError(exc,context,response):
     response.data = {
-  "msg" : "Refetch Token ไม่ถูกต้อง",
-  "code": "REFETCH_TOKEN_FAIL"
+  "msg" : "Authentication credentials were not provided",
+  "code": "HTTP_401_UNAUTHORIZED"
 }
     if response is not None:
         response.data['status_code'] = response.status_code
