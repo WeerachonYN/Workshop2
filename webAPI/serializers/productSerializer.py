@@ -4,7 +4,8 @@ from webAPI.exception import custom_exception_handler
 from webAPI.serializers.productImageSerializers import ProductImageSerializers
 from versatileimagefield.serializers import VersatileImageFieldSerializer
 class Product_ListSerializers(serializers.ModelSerializer):
-    # category = Product.objects.filter(category__in=(1,2))
+    image = VersatileImageFieldSerializer(
+        sizes='headshot')    
     class Meta:
         model = Product
         fields = ['url','id','category','name','price','detail','image','is_enabled','created_datetime']
