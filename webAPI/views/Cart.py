@@ -86,16 +86,14 @@ class cart_list(generics.ListCreateAPIView):
 
     def get(self, request, *args, **kwargs):
         response_data = super(cart_list, self).list(request, *args, **kwargs)
-        # response_data = user.username
+        print('response_data=',response_data.data)
         self.response_format["data"] = response_data.data
         self.response_format["status"] = True
+        # print('response_format=',self.response_format)
         if not response_data.data:
             self.response_format["message"] = "List empty"
         return Response(self.response_format)
-
-        
-        
-class cart_detail(generics.RetrieveUpdateDestroyAPIView):
+class cart_edit_delete(generics.RetrieveUpdateDestroyAPIView):
     queryset = Cart.objects.all()
     serializer_class = cartSerializers
     filter_backends = [filters.SearchFilter,DjangoFilterBackend,filters.OrderingFilter]
@@ -150,11 +148,4 @@ class cart_detail(generics.RetrieveUpdateDestroyAPIView):
                 }
                 return Response(custom_data)
 
-    def get_object(self):
-        queryset = self.get_queryset()
-        try:
-            obj =  queryset.get(pk=self.kwargs['pk'])
-            
-        except:
-            raise NotFound()
-        return obj
+   

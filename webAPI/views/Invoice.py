@@ -20,7 +20,7 @@ from rest_framework.exceptions import NotFound
 from rest_framework import status
 from webAPI.custom_Response import ResponseInfo
 
-class invoice_list(generics.ListCreateAPIView):
+class invoice_list(generics.ListAPIView):
     queryset = invoice.objects.all()
     serializer_class = InvoiceSerializers
     filter_backends = [filters.SearchFilter,DjangoFilterBackend,filters.OrderingFilter]
@@ -28,7 +28,6 @@ class invoice_list(generics.ListCreateAPIView):
     filterset_fields = ['created_datetime', 'status','user']
     ordering_fields = ['id','created_datetime', 'status']
     permission_classes = [permissions.IsAuthenticated]
-    # lookup_field = "invoice-detail"
 
     def __init__(self, **kwargs):
         self.response_format = ResponseInfo().response
@@ -43,7 +42,7 @@ class invoice_list(generics.ListCreateAPIView):
         return Response(self.response_format)
         
     
-class invoice_detail(generics.RetrieveUpdateDestroyAPIView):
+class invoice_detail(generics.RetrieveAPIView):
     queryset = invoice.objects.all()
     serializer_class = InvoiceDetailSerializers
     filter_backends = [filters.SearchFilter,DjangoFilterBackend,filters.OrderingFilter]
@@ -71,7 +70,7 @@ class invoice_detail(generics.RetrieveUpdateDestroyAPIView):
             raise NotFound()
         return obj          
 
-class checkouts(generics.ListCreateAPIView):
+class checkouts(generics.CreateAPIView):
     queryset = invoice.objects.all()
     serializer_class = checkoutSerializers
     permission_classes = [permissions.IsAuthenticated]
@@ -117,7 +116,7 @@ class checkouts(generics.ListCreateAPIView):
             "msg": "กรุณาเลือกสินค้าใส่ตะกร้า",
             },status=status.HTTP_400_BAD_REQUEST)
 
-class void_status(generics.ListCreateAPIView):
+class void_status(generics.CreateAPIView):
     queryset = invoice.objects.all()
     serializer_class = InvoiceSerializers()
     permission_classes = [permissions.IsAuthenticated]

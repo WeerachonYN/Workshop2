@@ -40,11 +40,10 @@ def api_root(request, format=None):
         'users': reverse('user-list', request=request, format=format),
         'group':reverse('group',request=request, format=format),
         'product': reverse('product-list', request=request, format=format),
-        'product_image': reverse('product_image-list', request=request, format=format),
         'category': reverse('category-list',request=request, format=format),
         'cart': reverse('cart-list',request=request, format=format),
         'invoice': reverse('invoice-list',request=request, format=format),
-        'invoice_item': reverse('invoice_item-list',request=request, format=format),
+    
     })
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):

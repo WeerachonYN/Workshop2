@@ -1,6 +1,7 @@
 from django.shortcuts import render,redirect
 from rest_framework.response import Response
 from rest_framework import generics
+from rest_framework.views import APIView
 #filter
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
@@ -18,7 +19,7 @@ from webAPI.custom_Response import ResponseInfo
 
 from webAPI.paginations import CustomPagination
 
-class product_list(generics.ListCreateAPIView):
+class product_list(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     queryset = Product.objects.all()
     serializer_class = Product_ListSerializers
@@ -74,7 +75,7 @@ class product_list(generics.ListCreateAPIView):
             self.response_format["message"] = "List empty"
         return Response(self.response_format)
         
-class product_detail(generics.RetrieveUpdateDestroyAPIView):
+class product_detail(generics.RetrieveAPIView):
     queryset = Product.objects.all()
     serializer_class = Product_DetailSerializers
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]

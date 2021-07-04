@@ -16,9 +16,9 @@ from webAPI.permissions import IsOwnerOrReadOnly
 from rest_framework.permissions import IsAuthenticated
 from webAPI.paginations import CustomPagination
 from webAPI.ordering import MyCustomOrdering
-from webAPI.exception import custom_exception_handler
 from rest_framework.exceptions import NotFound
-class category_list(generics.ListCreateAPIView):
+from webAPI.custom_Response import ResponseInfo
+class category_list(generics.ListAPIView):
     queryset = Category.objects.all()
     serializer_class = categorySerializers
     filter_backends = [filters.SearchFilter,DjangoFilterBackend,filters.OrderingFilter]
@@ -28,19 +28,17 @@ class category_list(generics.ListCreateAPIView):
     pagination_class = CustomPagination
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
-   
+    def __init__(self, **kwargs):
+        self.response_format = ResponseInfo().response
+        super(category_list, self).__init__(**kwargs)
 
-
-
-    # def create(self, request, *args, **kwargs):
-    #     serializer = self.get_serializer(data=request.data)
-    #     serializer.is_valid(raise_exception=True)
-    #     if self.check_signin_details(self.request.data):
-    #         self.perform_create(serializer)
-    #         return Response(data={"message": "User created successfully."}, status=status.HTTP_201_CREATED)
-    #     return Response(data={"message": "Password or username policy failed."}, status=status.HTTP_400_BAD_REQUEST)
-    
-
+    def get(self, request, *args, **kwargs):
+        response_data = super(category_list, self).list(request, *args, **kwargs)
+        self.response_format["data"] = response_data.data
+        self.response_format["status"] = True
+        if not response_data.data:
+            self.response_format["message"] = "List empty"
+        return Response(self.response_format)
 class category_detail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Category.objects.all()
     serializer_class = categorySerializers

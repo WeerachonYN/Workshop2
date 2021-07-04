@@ -12,12 +12,11 @@ from rest_framework_simplejwt.views import (
 
 #views
 from webAPI.views.User import api_root,UserViewSet,GroupViewSet,RegisterApi,TokenRefreshView,TokenObtainPairView
-from webAPI.views.Cart import cart_list,cart_detail
+from webAPI.views.Cart import cart_list,cart_edit_delete
 from webAPI.views.Category import category_list,category_detail
 from webAPI.views.Invoice import invoice_list,invoice_detail,checkouts,void_status
-from webAPI.views.Invoice_Item import invoice_item_list,invoice_item_detail
 from webAPI.views.Product import product_list,product_detail
-from webAPI.views.Product_Image import product_Image_list,product_Image_detail
+
 
 #viewset Custom
 GroupViewSet = GroupViewSet.as_view({
@@ -51,25 +50,21 @@ urlpatterns = format_suffix_patterns([
     path('product/',product_list.as_view(),name='product-list'),
     path('product/<int:pk>/',product_detail.as_view(),name='product-detail'),
          #product_image
-    path('product_image/',product_Image_list.as_view(),name='product_image-list'),
-    path('product_image/<int:pk>/',product_Image_detail.as_view(),name='product_image-detail'),
         #category
     path('category/', category_list.as_view(),name='category-list'),
     path('category/<int:pk>/',category_detail.as_view(),name='category-detail'),
         #cart
     path('cart/', cart_list.as_view(),name='cart-list'),
-    path('cart/<int:pk>/',cart_detail.as_view(),name='cart-detail'),
+    # path('cart')
+    path('cart/<int:pk>/',cart_edit_delete.as_view(),name='cart-detail'),
     # path('cart/<int:cart_id>/',cart_Delete.as_view(),name='cart-delete'),
-
          #invoice
     path('checkout/', checkouts.as_view(),name='checkout'),    
     path('invoice/', invoice_list.as_view(),name='invoice-list'),
     path('invoice/<int:pk>/',invoice_detail.as_view(),name='invoice-detail'),
     #void
-    path('invoice/<int:pk>/void/',void_status.as_view(),name='invoice-detail'),
+    path('invoice/<int:pk>/void/',void_status.as_view(),name='invoice-void'),
         #invoice_item
-    path('invoice_item/', invoice_item_list.as_view(),name='invoice_item-list'),
-    path('invoice_item/<int:pk>/',invoice_item_detail.as_view(),name='invoice_item-detail'),
    
 ])
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
