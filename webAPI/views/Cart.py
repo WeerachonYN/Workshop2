@@ -86,7 +86,7 @@ class cart_list(generics.ListCreateAPIView):
 
     def get(self, request, *args, **kwargs):
         response_data = super(cart_list, self).list(request, *args, **kwargs)
-        print('response_data=',response_data.data)
+      
         self.response_format["data"] = response_data.data
         self.response_format["status"] = True
         # print('response_format=',self.response_format)
@@ -123,14 +123,19 @@ class cart_edit_delete(generics.RetrieveUpdateDestroyAPIView):
             cartlist = Cart.objects.get(id=pk)
         except:
             raise NotFound()
-        data = request.data
-        cartlist.total = int(data['quantity'])*(cartlist.product.price)
-        cartlist.quantity = data['quantity']
-        if cartlist == 0:
+        data = request.data     
+        if int(data['quantity']) == 0:
             cartlist.delete()
             return Response({
                 "msg":"ลบข้อมูลสำเร็จ",
             },200)
+        if int(data['quantity']) < 0:
+            return Response({
+                "msg":"กรุณากรอกจำนวนเต็ม",
+            },400)
+        
+        cartlist.total = int(data['quantity'])*(cartlist.product.price)
+        cartlist.quantity = data['quantity']
         cartlist.save()
         response = cartSerializers(cartlist).data
         return Response({

@@ -48,7 +48,7 @@ def _exception_notAuthenticated(exc,context,response):
 
 def _exception_notAllowed(exc,context,response):
     response.data = {
-        'error':'Method Not Allowed'
+        'msg':'Method Not Allowed'
     }
     if response is not None:
         response.data['status_code'] = response.status_code  

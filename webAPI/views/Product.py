@@ -33,7 +33,7 @@ class product_list(generics.ListAPIView):
 
     def get_queryset(self):
         queryset = Product.objects.all()
-        sort_by = self.request.query_params.get('sort','desc')
+        sort_by = self.request.query_params.get('sort','asc')
         #get params
         category_in = self.request.query_params.get('category__in',None)
         category_not_in = self.request.query_params.get('category_not_in',None)
@@ -51,9 +51,9 @@ class product_list(generics.ListAPIView):
                 list_params_not_in.append(int(i))
         #sort
         if sort_by == 'desc':
-            queryset = queryset.order_by('price','created_datetime')
+            queryset = queryset.order_by('-price')
         else:
-            queryset = queryset.order_by('-price','-created_datetime')
+            queryset = queryset.order_by('price')
         #filter in
         if category_in:
             queryset = queryset.filter(category__in=list_params_in)
@@ -75,12 +75,12 @@ class product_list(generics.ListAPIView):
             self.response_format["message"] = "List empty"
         return Response(self.response_format)
         
-class product_detail(generics.RetrieveAPIView):
+class product_detail(generics.ListAPIView):
     queryset = Product.objects.all()
     serializer_class = Product_DetailSerializers
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     
-    def retrieve(self, request, *args, **kwargs):
+    def list(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
         if serializer.data:

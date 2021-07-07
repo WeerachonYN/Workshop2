@@ -16,7 +16,7 @@ from webAPI.permissions import IsOwnerOrReadOnly
 from rest_framework.permissions import IsAuthenticated
 from webAPI.paginations import CustomPagination
 from webAPI.ordering import MyCustomOrdering
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound,MethodNotAllowed
 from webAPI.custom_Response import ResponseInfo
 class category_list(generics.ListAPIView):
     queryset = Category.objects.all()
@@ -26,7 +26,7 @@ class category_list(generics.ListAPIView):
     filterset_fields = ['is_enabled']
     ordering_fields = ['id','name']
     pagination_class = CustomPagination
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticated]
 
     def __init__(self, **kwargs):
         self.response_format = ResponseInfo().response
@@ -42,7 +42,7 @@ class category_list(generics.ListAPIView):
 class category_detail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Category.objects.all()
     serializer_class = categorySerializers
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticated]
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()

@@ -11,7 +11,7 @@ class InvoiceSerializers(serializers.ModelSerializer):
 # detail
 class InvoiceDetailSerializers(serializers.ModelSerializer):
     invoices_item = Invoice_ItemSerializers(many=True,  read_only=True)
-    
+    # invoices_item = serializers.HyperlinkedRelatedField(many=True,read_only=True,view_name='invoice-item')
     
     class Meta:
         model = invoice
