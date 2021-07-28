@@ -53,7 +53,6 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
        'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -116,7 +115,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'th'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Bangkok'
 
 USE_I18N = True
 
@@ -159,7 +158,7 @@ REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'webAPI.exception.custom_exception_handler',
      #pagination
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 8,
+    'PAGE_SIZE': 6,
     #filter backend
      'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
    
@@ -199,7 +198,7 @@ VERSATILEIMAGEFIELD_RENDITION_KEY_SETS = {
         ('full_size', 'url'),
         ('thumbnail', 'thumbnail__100x100'),
         ('medium_square_crop', 'crop__400x400'),
-        ('small_square_crop', 'crop__50x50')
+        ('small_square_crop', 'crop__200x200')
     ]
 }
 CORS_ALLOWED_ORIGINS = [

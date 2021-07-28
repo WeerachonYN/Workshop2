@@ -4,7 +4,7 @@ from rest_framework import generics
 from rest_framework.views import APIView
 
 #serializer & Models
-from webAPI.serializers.userSerializers import UserSerializer,GroupSerializer,RegisterApiSerializer
+from webAPI.serializers.userSerializers import UserSerializer,GroupSerializer,RegisterApiSerializer,UserEditSerializer
 from django.contrib.auth.models import User,Group
 #viewSET
 from rest_framework import viewsets
@@ -32,12 +32,16 @@ from webAPI.exception import custom_exception_handler
 from rest_framework_simplejwt.views import TokenViewBase
 from webAPI.serializers.userSerializers import TokenRefreshLifetimeSerializer,TokenObtainLifetimeSerializer
 from rest_framework import status
+from rest_framework.exceptions import NotAuthenticated,NotFound,ParseError
+from django.shortcuts import get_object_or_404
 
 @api_view(['GET'])
 def api_root(request, format=None):
     return Response({
         'register':reverse('register', request=request, format=format),
         'users': reverse('user-list', request=request, format=format),
+        'ImageUser':reverse('imageUser-list',request=request, format=format),
+        'comment':reverse('comment-list',request=request, format=format),
         'group':reverse('group',request=request, format=format),
         'product': reverse('product-list', request=request, format=format),
         'category': reverse('category-list',request=request, format=format),
@@ -46,22 +50,41 @@ def api_root(request, format=None):
     
     })
 
-class UserViewSet(viewsets.ReadOnlyModelViewSet):
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
-    permission_classes = [permissions.DjangoModelPermissionsOrAnonReadOnly,]
-    queryset = User.objects.all()
-    filter_backends = [filters.SearchFilter,DjangoFilterBackend,filters.OrderingFilter]
-    search_fields = ['id', 'username','email']
-    filterset_fields = ['id', 'is_active','is_staff']
-    ordering_fields = ['id','username', 'date_joined']
-    serializer_class = UserSerializer
-    
-    def get(self, request, format=None):
-        content = {
-            'user': str(request.user),  # `django.contrib.auth.User` instance.
-            'auth': str(request.auth),  # None
-        }
-        return Response(content)
+class UserViewSet(viewsets.ViewSet):
+    def list(self, request):
+        try:
+            queryset = User.objects.get(username=self.request.user)
+        except:
+            raise NotAuthenticated()
+
+        serializer = UserSerializer(queryset)
+        return Response(serializer.data)
+
+    def retrieve(self, request, pk=None):
+        queryset = User.objects.all()
+        user = get_object_or_404(queryset, pk=pk)
+        serializer = UserSerializer(user)
+        return Response(serializer.data)
+    def patch(self, request, pk=None):
+        try:
+            userlist = User.objects.get(id=pk)
+        except:
+            raise NotFound()
+        data = request.data     
+        if data['email'] is not None:
+            userlist.first_name = data['first_name']
+            userlist.last_name = data['last_name']
+            userlist.email = data['email']
+            userlist.save()
+            response = UserEditSerializer(userlist).data
+            return Response({
+                "msg" : "บันทึกสำเร็จ",
+                "data":[response]
+            })
+        return Response({
+             "code" : "บันทึกไม่สำเร็จ",
+             "msg":validate_email.error
+        },400)
 
 class GroupViewSet(viewsets.ModelViewSet):
     """
@@ -108,3 +131,28 @@ class TokenRefreshView(TokenViewBase):
         Renew tokens (access and refresh) with new expire time based on specific user's access token.
     """
     serializer_class = TokenRefreshLifetimeSerializer
+
+# class EditUserSerializers(serializers.ModelSerializer):    
+#     first_name = serializers.CharField(max_length=20,
+#             error_messages={"blank": "กรุณากรอกชื่อ",'write_only':True})
+
+#     last_name = serializers.IntegerField(
+#              error_messages={"blank": "กรุณากรอกนามสกุล",'write_only':True})
+#     email = serializers.CharField(
+#              error_messages={"blank": "กรุณากรอกอีเมล์",'write_only':True})
+    
+#     class Meta:
+#         model = User
+#         fields = ['id','username','first_name','last_name','email']
+#         extra_kwargs = {'username':{'write_only': True}}
+
+  
+#     def validate_product(self, product):
+#         try:
+#             is_enableds = Product.objects.get(pk = int(product))
+#         except:
+#              raise ValidationError('ไม่พบสินค้า')
+        
+#         if not is_enableds.is_enabled:
+#             raise ValidationError('สินค้านี้ถูกปิดการใช้งาน')
+#         return product

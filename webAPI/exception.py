@@ -7,7 +7,7 @@ def custom_exception_handler(exc, context):
         'MethodNotAllowed':_exception_notAllowed,
         'NotAuthenticated':_exception_notAuthenticated,
         'PermissionDenied':_exception_permissionDenied,
-        'ParseError':_exception_ParseError,
+        # 'ParseError':_exception_ParseError,
         'NotFound':_exception_NotFound,
         'NotAcceptable':_exception_notAccept,
         'UnsupportedMediaType':_exception_unsupportMD_type,

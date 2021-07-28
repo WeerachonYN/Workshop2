@@ -27,7 +27,7 @@ class product_list(generics.ListAPIView):
     search_fields = ['name']
     filterset_fields = ['id', 'is_enabled','price']
     ordering_fields = ['price','created_datetime']
-    pagination_class = CustomPagination
+    
     
    
 
@@ -78,7 +78,7 @@ class product_list(generics.ListAPIView):
 class product_detail(generics.ListAPIView):
     queryset = Product.objects.all()
     serializer_class = Product_DetailSerializers
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.AllowAny]
     
     def list(self, request, *args, **kwargs):
         instance = self.get_object()

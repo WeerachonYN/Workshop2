@@ -5,13 +5,14 @@ from django.contrib.auth.models import User
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework import status
+from webAPI.serializers.productSerializer import Product_CARTSerializers
 class cartSerializers(serializers.ModelSerializer):    
     product = serializers.CharField(max_length=20,
             error_messages={"blank": "กรุณากรอกรหัสสินค้า",'write_only':True})
 
     quantity = serializers.IntegerField(
              error_messages={"blank": "กรุณาใส่จำนวนสินค้า",'write_only':True})
-
+    
     class Meta:
         model = Cart
         fields = ['id','product','user','quantity','total']
@@ -32,7 +33,13 @@ class cartSerializers(serializers.ModelSerializer):
         if not is_enableds.is_enabled:
             raise ValidationError('สินค้านี้ถูกปิดการใช้งาน')
         return product
-        
+class CartGetItemSerializer(serializers.ModelSerializer):
+    product = Product_CARTSerializers()
+    class Meta:
+            model = Cart
+            fields = ['id','user','product','quantity','total']
+
+   
 class cartEditSerializers(serializers.ModelSerializer):    
     # product = serializers.CharField(max_length=20,
     #         error_messages={"blank": "กรุณากรอกรหัสสินค้า",'write_only':True})

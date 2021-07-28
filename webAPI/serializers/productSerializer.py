@@ -19,3 +19,17 @@ class Product_DetailSerializers(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ['url','id','category','name','price','detail','image','is_enabled','created_datetime','product_image']
+
+class Product_CARTSerializers(serializers.ModelSerializer):
+    category = serializers.SerializerMethodField()
+    category_id = serializers.SerializerMethodField()
+    image = VersatileImageFieldSerializer(
+        sizes='headshot'
+        )
+    class Meta:
+        model = Product
+        fields = ['id','name','price','image','detail','category','category_id']
+    def get_category(self,obj):
+        return obj.category.name
+    def get_category_id(self,obj):
+        return obj.category.id

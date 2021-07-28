@@ -16,40 +16,37 @@ from django.contrib.auth.models import User
 from webAPI.models.cart import Cart
 from webAPI.models.Invoice_item import invoice_item
 import datetime
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound,ParseError
 from rest_framework import status
 from webAPI.custom_Response import ResponseInfo
 
+from webAPI.paginations import CustomPagination
 class invoice_list(generics.ListAPIView):
     queryset = invoice.objects.all()
     serializer_class = InvoiceSerializers
     filter_backends = [filters.SearchFilter,DjangoFilterBackend,filters.OrderingFilter]
-    search_fields = ['id', 'user','status']
-    filterset_fields = ['created_datetime', 'status','user']
-    ordering_fields = ['id','created_datetime', 'status']
+    search_fields = ['id','status']
+    filterset_fields = ['status']
+    ordering_fields = ['created_datetime']
     permission_classes = [permissions.IsAuthenticated]
-
-    def __init__(self, **kwargs):
-        self.response_format = ResponseInfo().response
-        super(invoice_list, self).__init__(**kwargs)
-
-    def get(self, request, *args, **kwargs):
-        response_data = super(invoice_list, self).list(request, *args, **kwargs)
-        self.response_format["data"] = response_data.data
-        self.response_format["status"] = True
-        if not response_data.data:
-            self.response_format["message"] = "List empty"
-        return Response(self.response_format)
+    pagination_class = CustomPagination
+    def get_queryset(self):
+        queryset = invoice.objects.filter(user = self.request.user).order_by('-created_datetime')
+        return queryset
         
     
 class invoice_detail(generics.RetrieveAPIView):
     queryset = invoice.objects.all()
     serializer_class = InvoiceDetailSerializers
     filter_backends = [filters.SearchFilter,DjangoFilterBackend,filters.OrderingFilter]
-    search_fields = ['id', 'user','status']
-    filterset_fields = ['created_datetime', 'status','user']
-    ordering_fields = ['id','created_datetime', 'status']
+    search_fields = ['id','status']
+    filterset_fields = ['created_datetime', 'status']
+    ordering_fields = ['created_datetime']
     permission_classes = [permissions.IsAuthenticated]
+    
+    def get_queryset(self):
+        queryset = invoice.objects.filter(user = self.request.user)
+        return queryset
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -60,7 +57,7 @@ class invoice_detail(generics.RetrieveAPIView):
                     "data": serializer.data
             }
             return Response(custom_data)
-
+    
     def get_object(self):
         queryset = self.get_queryset()
         try:
@@ -70,14 +67,18 @@ class invoice_detail(generics.RetrieveAPIView):
             raise NotFound()
         return obj          
 
-class checkouts(generics.CreateAPIView):
+class checkouts(generics.ListCreateAPIView):
     queryset = invoice.objects.all()
     serializer_class = checkoutSerializers
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
         data ={}
-        carts = Cart.objects.filter(user=self.request.user) 
+        try:
+            carts = Cart.objects.filter(user=self.request.user) 
+            print('Authen',carts)
+        except:
+            raise ParseError('กรุณาล๊อคอิน')
         sum_total=0
         if len(carts)!=0:
             for i in carts:

@@ -1,11 +1,12 @@
 from django.shortcuts import render,redirect
 from rest_framework.response import Response
 from rest_framework import generics
+from rest_framework.views import APIView
 #filter
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
 #serializer & Models
-from webAPI.serializers.cartSerializers import cartSerializers,cartEditSerializers
+from webAPI.serializers.cartSerializers import cartSerializers,CartGetItemSerializer,cartEditSerializers
 from webAPI.models.cart import Cart
 from webAPI.models.product import Product
 #permission & Authenticated
@@ -17,7 +18,7 @@ from rest_framework.exceptions import NotFound ,ParseError,NotAuthenticated
 from webAPI.custom_Response import ResponseInfo
 from rest_framework import status
 from django.contrib.auth.admin import User
-
+from webAPI.paginations import CustomPagination
 class cart_list(generics.ListCreateAPIView):
     queryset = Cart.objects.all()
     serializer_class = cartSerializers
@@ -26,9 +27,16 @@ class cart_list(generics.ListCreateAPIView):
     filterset_fields = ['id', 'product','user']
     ordering_fields = ['id','quantity', 'total']
     permission_classes = [permissions.IsAuthenticated]
-    # def perform_create(self, serializer):
-    #     serializer.save(user=self.request.user)  
-    
+    pagination_class = CustomPagination
+    # def get_queryset(self):
+    #     queryset = Cart.objects.filter(user = self.request.user)
+    #     return queryset
+  
+    def list(self, request):
+        queryset = Cart.objects.filter(user=self.request.user)
+        serializer = CartGetItemSerializer(queryset, many=True)
+        return Response(serializer.data)
+
     def post(self, request, *args,  **kwargs):
         serializer = self.get_serializer(data=request.data)
         data ={}
@@ -62,6 +70,7 @@ class cart_list(generics.ListCreateAPIView):
 
             data['id'] = items.id
             data['product'] = items.product.name
+            data['price']= items.product.price
             data['quantity'] = items.quantity
             data['total'] = items.total
             return Response({ 
@@ -75,24 +84,30 @@ class cart_list(generics.ListCreateAPIView):
                 "code": "ADD_TO_CART_FAIL",
                 'msg': "บันทึกไม่สำเร็จ",
                  "error": serializer.errors
-                },status = status.HTTP_401_UNAUTHORIZED)
+                },status = status.HTTP_400_BAD_REQUEST)
    
+    # def list(self, request):
+    #     try:
+    #         queryset = Cart.objects.filter(user=self.request.user)
+    #     except:
+    #         raise NotAuthenticated()
 
-    
+    #     serializer = CartGetItemSerializer(queryset)
+    #     return Response(serializer.data)
             
-    def __init__(self, **kwargs):
-        self.response_format = ResponseInfo().response
-        super(cart_list, self).__init__(**kwargs)
-
-    def get(self, request, *args, **kwargs):
-        response_data = super(cart_list, self).list(request, *args, **kwargs)
-      
-        self.response_format["data"] = response_data.data
-        self.response_format["status"] = True
-        # print('response_format=',self.response_format)
-        if not response_data.data:
-            self.response_format["message"] = "List empty"
-        return Response(self.response_format)
+    # def __init__(self, **kwargs):
+    #     self.response_format = ResponseInfo().response
+    #     super(cart_list, self).__init__(**kwargs)
+    
+    # def get(self, request, *args, **kwargs):
+    #     response_data = Cart.objects.filter(user=self.request.user)
+    #     serializer = cartSerializers(response_data)
+    #     self.response_format["data"] = serializer.data
+    #     self.response_format["status"] = True
+    #     # print('response_format=',self.response_format)
+    #     if not response_data:
+    #         self.response_format["message"] = "List empty"
+    #     return Response(self.response_format)
 class cart_edit_delete(generics.RetrieveUpdateDestroyAPIView):
     queryset = Cart.objects.all()
     serializer_class = cartSerializers
@@ -120,6 +135,7 @@ class cart_edit_delete(generics.RetrieveUpdateDestroyAPIView):
 
     def patch(self, request, pk):
         try:
+          
             cartlist = Cart.objects.get(id=pk)
         except:
             raise NotFound()

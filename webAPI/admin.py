@@ -6,6 +6,8 @@ from webAPI.models.category import Category
 from webAPI.models.cart import Cart
 from webAPI.models.Invoice import invoice
 from webAPI.models.Invoice_item import invoice_item
+from webAPI.models.Comment import Comment
+from webAPI.models.ImageUser import ImageUser
 from rest_framework.authtoken.admin import TokenAdmin
 # Register your models here.
 class ImageProductAdmins(admin.StackedInline):
@@ -106,7 +108,10 @@ class InvoiceAdmin(admin.ModelAdmin):
 admin.site.register(invoice,InvoiceAdmin)
 
 class InvoiceITEMAdmin(admin.ModelAdmin):
-      list_display = (
+    
+    class Meta:
+        model = Product
+    list_display = (
         'id',
         'product',
         'invoice',
@@ -118,3 +123,25 @@ admin.site.register(invoice_item,InvoiceITEMAdmin)
 
 
 TokenAdmin.raw_id_fields = ['user']
+class CommentAdmin(admin.ModelAdmin):
+    class Meta:
+        model = Comment
+    list_display=(
+        'id',
+        'name',
+        'message',
+        'product',
+        'user',
+        'datetime',
+        'is_activate'
+    )
+admin.site.register(Comment,CommentAdmin)
+class ImageUserAdmin(admin.ModelAdmin):
+    class Meta:
+        model = ImageUser
+    list_display=(
+        'id',
+        'user',
+        'image',
+    )
+admin.site.register(ImageUser,ImageUserAdmin)

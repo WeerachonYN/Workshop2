@@ -4,8 +4,10 @@ from rest_framework.authtoken.models import Token
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer,TokenObtainPairSerializer
 from rest_framework.response import Response
-from rest_framework.exceptions import ValidationError,AuthenticationFailed
+from rest_framework.exceptions import ValidationError,AuthenticationFailed,ParseError
 from django.contrib.auth import password_validation
+from webAPI.serializers.UserImage import ImageUserSerializer
+from rest_framework.validators import UniqueValidator
 
 class GroupSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -15,12 +17,20 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     # snippets = serializers.HyperlinkedRelatedField(many=True, view_name='snippet-detail', read_only=True)
     # users = serializers.PrimaryKeyRelatedField(many=True, queryset=Product.objects.all())
-    
+    images = ImageUserSerializer()
     class Meta:
         model = User
-        fields = ['id', 'username','first_name', 'last_name','email']
+        fields = ['id', 'username','first_name', 'last_name','email','images']
 
- 
+class UserEditSerializer(serializers.ModelSerializer):
+    email = email = serializers.EmailField(validators=[UniqueValidator(queryset=User.objects.all())])
+    images = ImageUserSerializer()
+    class Meta:
+        model = User
+        fields = ['id', 'username','first_name', 'last_name','email','images']
+    def validate_email(email):
+        if email.is_valid() :
+            raise serializers.ValidationError('กรุณากรอกอีเมล์ให้ถูกต้อง.')
 #loginTOKEN
 class TokenObtainLifetimeSerializer(TokenObtainPairSerializer):
 
@@ -28,13 +38,16 @@ class TokenObtainLifetimeSerializer(TokenObtainPairSerializer):
         try:
             data = super().validate(attrs)
             refresh = self.get_token(self.user)
+            # user = {
+            #     id:
+            # }
             data['refresh'] = str(refresh)
             data['access'] = str(refresh.access_token)
             data['expires_in'] = int(refresh.access_token.lifetime.total_seconds())
             data['token_type']= str(refresh.token_type)
             return data
         except:            
-            raise AuthenticationFailed({
+            raise ParseError({
                 "msg" : "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง",
                 "code": "LOGIN_FAIL"
                 }, 400)
