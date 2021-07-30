@@ -20,7 +20,7 @@ from rest_framework.exceptions import NotFound,ParseError
 from rest_framework import status
 from webAPI.custom_Response import ResponseInfo
 
-from webAPI.paginations import CustomPagination
+from webAPI.paginations import CustomPaginations
 class invoice_list(generics.ListAPIView):
     queryset = invoice.objects.all()
     serializer_class = InvoiceSerializers
@@ -29,7 +29,7 @@ class invoice_list(generics.ListAPIView):
     filterset_fields = ['status']
     ordering_fields = ['created_datetime']
     permission_classes = [permissions.IsAuthenticated]
-    pagination_class = CustomPagination
+    pagination_class = CustomPaginations
     def get_queryset(self):
         queryset = invoice.objects.filter(user = self.request.user).order_by('-created_datetime')
         return queryset

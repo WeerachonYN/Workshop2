@@ -9,6 +9,7 @@ class Product(models.Model):
     detail = models.CharField(max_length=225)
 #     image= VersatileImageField(max_length=255,upload_to='images/products',default='',blank=True, null=True)
     is_enabled = models.BooleanField(default=True)
+    recommend = models.BooleanField(default=False)
     created_datetime = models.DateTimeField(auto_now=True)
     image = VersatileImageField(
         'Headshot',

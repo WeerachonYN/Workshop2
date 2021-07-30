@@ -25,7 +25,7 @@ class category_list(generics.ListAPIView):
     search_fields = ['id', 'name']
     filterset_fields = ['is_enabled']
     ordering_fields = ['id','name']
-   
+    pagination_class=CustomPagination
     permission_classes = [permissions.AllowAny]
 
     def __init__(self, **kwargs):

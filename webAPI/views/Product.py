@@ -25,9 +25,9 @@ class product_list(generics.ListAPIView):
     serializer_class = Product_ListSerializers
     filter_backends = [filters.SearchFilter,DjangoFilterBackend,filters.OrderingFilter]
     search_fields = ['name']
-    filterset_fields = ['id', 'is_enabled','price']
+    filterset_fields = ['id', 'is_enabled','price','recommend']
     ordering_fields = ['price','created_datetime']
-    
+    pagination_class=CustomPagination
     
    
 

@@ -30,11 +30,12 @@ class ProductAdmin(admin.ModelAdmin):
     list_editable = (
         'is_enabled',
         'detail',
-        'price'
+        'price',
     )
     list_filter = (
         'category',
        'is_enabled',
+       'recommend',
     )
     search_fields = (
         'name',
@@ -128,7 +129,7 @@ class CommentAdmin(admin.ModelAdmin):
         model = Comment
     list_display=(
         'id',
-        'name',
+        
         'message',
         'product',
         'user',

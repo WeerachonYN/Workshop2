@@ -158,7 +158,7 @@ REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'webAPI.exception.custom_exception_handler',
      #pagination
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 6,
+    'PAGE_SIZE': 8,
     #filter backend
      'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
    
